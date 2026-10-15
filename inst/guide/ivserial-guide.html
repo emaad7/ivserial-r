@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>ivserial: user guide</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">ivserial: user guide</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#what-the-package-does" id="toc-what-the-package-does">1.
+What the package does</a></li>
+<li><a href="#two-ways-to-use-it" id="toc-two-ways-to-use-it">2. Two
+ways to use it</a></li>
+<li><a href="#installation" id="toc-installation">3.
+Installation</a></li>
+<li><a href="#preparing-your-data" id="toc-preparing-your-data">4.
+Preparing your data</a></li>
+<li><a href="#the-window" id="toc-the-window">5. The window</a></li>
+<li><a href="#r-code" id="toc-r-code">6. R code</a></li>
+<li><a href="#reading-the-output" id="toc-reading-the-output">7. Reading
+the output</a></li>
+<li><a href="#sample-size-and-power" id="toc-sample-size-and-power">8.
+Sample size and power</a></li>
+<li><a href="#the-null-distribution" id="toc-the-null-distribution">9.
+The null distribution</a></li>
+<li><a href="#residuals-of-fitted-models" id="toc-residuals-of-fitted-models">10. Residuals of fitted
+models</a></li>
+<li><a href="#troubleshooting" id="toc-troubleshooting">11.
+Troubleshooting</a></li>
+<li><a href="#reference-and-citation" id="toc-reference-and-citation">12. Reference and citation</a></li>
+</ul>
+</div>
+
+<p>Exact symbolic tests of serial independence. Companion software to E.
+Ashtari Nezhad, <em>Information Variance and Exact Symbolic Tests of
+Serial Independence</em>. A Python version with the same functions and
+output is on PyPI (<code>pip install ivserial</code>).</p>
+<div id="what-the-package-does" class="section level2">
+<h2>1. What the package does</h2>
+<p><code>ivserial</code> tests whether a time series is a sequence of
+independent and identically distributed (i.i.d.) values. The test is
+<strong>rank based and exact</strong>: under independence its P-value is
+valid for every sample size and every continuous distribution, with no
+model, bandwidth or tuning parameter to choose. It reports</p>
+<ul>
+<li>the P-value of the proposed <strong>combined test C</strong> and of
+its two components: the <strong>block statistic Q</strong>, which sees
+dependence among several consecutive values, including dependence that
+is invisible in every pair, and the <strong>portmanteau P2</strong>,
+which looks at pairs at lags 1 and 2;</li>
+<li><strong>V-hat</strong>, the strength of the dependence on a scale
+from 0 to 1 (the serial Cramér coefficient, which for pairs is Cramér’s
+V), and <strong>Gamma-hat</strong>, the efficiency of the test;</li>
+<li>the <strong>patterns</strong> of consecutive values that occur
+unusually often or rarely, which show what kind of dependence is
+present;</li>
+<li><strong>sample size and power</strong> calculations, and the
+explicit <strong>null distribution</strong> of Q.</li>
+</ul>
+</div>
+<div id="two-ways-to-use-it" class="section level2">
+<h2>2. Two ways to use it</h2>
+<ul>
+<li><strong>The window (no programming).</strong>
+<code>ivserial_app()</code> opens the graphical interface in the
+browser: open a CSV or Excel file, pick a column, press <em>Run
+test</em>. Sample-size planning, the null distribution and this guide
+are in their own tabs.</li>
+<li><strong>R code.</strong> <code>serial_test(x)</code> in a script or
+at the console; suited to many series and to reproducible work.</li>
+</ul>
+<p>Both use the same functions and give the same results: everything
+that can be done in code can also be done in the window.</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Window (<code>ivserial_app()</code>)</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Test one series</td>
+<td>Test tab, choose column, <em>Run test</em></td>
+<td><code>serial_test(x)</code></td>
+</tr>
+<tr class="even">
+<td>Screen many series</td>
+<td>tick <em>test all columns</em></td>
+<td><code>screen_series(data)</code></td>
+</tr>
+<tr class="odd">
+<td>Prices to log returns</td>
+<td><em>Transform: log returns</em></td>
+<td><code>transform = &quot;logdiff&quot;</code></td>
+</tr>
+<tr class="even">
+<td>Options (B, seed, m, d, level, lags, patterns)</td>
+<td>option fields</td>
+<td>arguments of <code>serial_test</code></td>
+</tr>
+<tr class="odd">
+<td>Save results</td>
+<td><em>Save report (.txt)</em>, <em>Save results (.csv)</em></td>
+<td><code>capture.output(print(res))</code>,
+<code>as.data.frame(res)</code></td>
+</tr>
+<tr class="even">
+<td>Sample size / power</td>
+<td>Sample size &amp; power tab</td>
+<td><code>required_sample_size</code>, <code>approximate_power</code>,
+<code>sample_size_table</code></td>
+</tr>
+<tr class="odd">
+<td>Default resolution for n</td>
+<td><em>Resolution for n</em></td>
+<td><code>choose_resolution(n)</code></td>
+</tr>
+<tr class="even">
+<td>Null distribution, critical values</td>
+<td>Null distribution tab</td>
+<td><code>null_limit_summary</code>, <code>null_limit_sf</code>,
+<code>null_limit_quantile</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="installation" class="section level2">
+<h2>3. Installation</h2>
+<p>You need R (free, from <a href="https://cran.r-project.org" class="uri">https://cran.r-project.org</a>); RStudio is optional. In R,
+install the package from GitHub:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)                       <span class="co"># once</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;emaad7/ivserial-r&quot;</span>)</span></code></pre></div>
+<p>or, from a downloaded source file,
+<code>install.packages(&quot;ivserial_1.0.1.tar.gz&quot;, repos = NULL, type = &quot;source&quot;)</code>.
+For the window also install <code>shiny</code>, and for Excel files
+<code>readxl</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;shiny&quot;</span>, <span class="st">&quot;readxl&quot;</span>))</span></code></pre></div>
+<p>Then</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(ivserial)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">ivserial_app</span>()          <span class="co"># the window</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">ivserial_guide</span>()        <span class="co"># this guide in the browser (also vignette(&quot;ivserial&quot;))</span></span></code></pre></div>
+</div>
+<div id="preparing-your-data" class="section level2">
+<h2>4. Preparing your data</h2>
+<ul>
+<li>A <strong>CSV</strong>, <strong>TXT</strong> or
+<strong>Excel</strong> (.xlsx) file, or any numeric vector in R.</li>
+<li><strong>One series per column, rows in time order</strong> (oldest
+first). A first row with names is optional; the delimiter and a decimal
+comma are detected; non-numeric columns such as dates are ignored;
+missing values are removed.</li>
+<li>At least 20 observations; several hundred give the most informative
+results.</li>
+<li><strong>Prices or returns?</strong> The test is applied to the
+values you give it. For prices and other trending series use the
+<strong>log returns</strong> (or differences): a trending series is
+never i.i.d., and the test would only detect the trend.</li>
+</ul>
+<p>The package contains the 20 daily exchange rates analysed in the
+paper, as the data frame <code>exchange_rates</code> and as the file
+<code>system.file(&quot;extdata&quot;, &quot;exchange_rates.csv&quot;, package = &quot;ivserial&quot;)</code>
+(prices; use the log-return transform).</p>
+</div>
+<div id="the-window" class="section level2">
+<h2>5. The window</h2>
+<p><code>ivserial_app()</code> opens the window in the web browser (or
+in the RStudio viewer). It has four tabs.</p>
+<p><strong>Test.</strong> <em>Browse</em> for your data file, or press
+<em>Use example data</em>. Choose the series (column), or tick <em>test
+all columns</em> to screen every column at once (with Benjamini–Hochberg
+adjustment). Choose the transform: none, differences, or log returns
+(prices). Press <em>Run test</em>. <em>Save report (.txt)</em> saves the
+report and <em>Save results (.csv)</em> one row of results per series.
+The options can be left at their defaults: <em>B</em> = 9999 random
+permutations, block length <em>m</em> and classes <em>d</em> chosen
+automatically (<code>auto</code>), level 0.05, portmanteau with lags 1
+and 2. Keep the <strong>seed</strong> fixed to make the P-values
+reproducible; leave it blank for a random seed.</p>
+<p><strong>Sample size &amp; power.</strong> Enter Gamma, or V (between
+0 and 1) instead, tau, <em>m</em>, <em>d</em>, the level and the target
+powers, then press <em>Required sample size</em>, <em>Power for n</em>
+or <em>Resolution for n</em>. <em>Use last test</em> fills in the
+estimates of the last test, for example on a pilot sample.</p>
+<p><strong>Null distribution.</strong> Enter <em>m</em>, <em>d</em> and,
+optionally, a value of Q, and press <em>Compute</em>: the components,
+mean, variance and critical values of the limit, and the asymptotic
+P-value of Q.</p>
+<p><strong>User guide.</strong> This guide.</p>
+<p>To finish, close the browser tab and press <em>Esc</em> (or
+<em>Stop</em>) in R.</p>
+</div>
+<div id="r-code" class="section level2">
+<h2>6. R code</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">library</span>(ivserial)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">diff</span>(<span class="fu">log</span>(exchange_rates<span class="sc">$</span>China))   <span class="co"># log returns of the yuan</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">serial_test</span>(x, <span class="at">B =</span> <span class="dv">999</span>, <span class="at">seed =</span> <span class="dv">1</span>, <span class="at">label =</span> <span class="st">&quot;China&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>res</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; Exact symbolic test of serial independence  [China]</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; ===================================================</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Observations n = 939</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; Block statistic: m = 3 consecutive values, d = 5 quantile classes (125 patterns)</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; Portmanteau: lags 1..2, d = 5 classes</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; Random permutations B = 999</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Test                                 Statistic     P-value</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; C = min(p_Q, p_P2)  [proposed]                      0.0010</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; Q  (blocks, permutation)               380.369      0.0010</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; Q  (blocks, asymptotic)                           &lt; 0.0001</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; P2 (lags, permutation)                 170.349      0.0010</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; P2 (lags, asymptotic)                             &lt; 0.0001</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; Serial independence is REJECTED at the 0.05 level (combined test C).</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; Strength of dependence: V-hat = 0.109</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;   (serial Cramer coefficient, 0 to 1: 0 = independent blocks, 1 = each value determines its block)</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; Efficiency: Gamma-hat = 0.2864</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;   (bias-corrected normalized information variance = approximate Bahadur slope; about 0 under independence)</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; Planning: power 0.8 against dependence of this strength needs about 250 observations</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;   (tau-hat = 2.943; Corollary 4.8 of the paper).</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; Most over- and under-represented patterns (classes 1 = lowest ... 5 = highest):</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; pattern         observed  expected  residual</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; 3-3-3                 41       7.5     12.24</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; 1-5-5                 20       7.5      4.57</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; 1-1-5                 19       7.5      4.20</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt; 5-5-5                 17       7.5      3.47</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a><span class="co">#&gt; 2-3-2                 15       7.5      2.74</span></span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="co">#&gt; 4-4-2                 15       7.5      2.74</span></span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="co">#&gt; 5-1-5                 15       7.5      2.74</span></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="co">#&gt; 5-5-1                 15       7.5      2.74</span></span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="co">#&gt; Residual = (observed - expected)/sqrt(expected); |residual| &gt; 3 is notable.</span></span></code></pre></div>
+<p>(The examples in this guide use <code>B = 999</code> to run quickly;
+the default is <code>B = 9999</code>.) The result is a list:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>res<span class="sc">$</span>p_C                                  <span class="co"># P-value of the combined test C</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.001</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>res<span class="sc">$</span>reject                               <span class="co"># decision at level alpha</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">c</span>(res<span class="sc">$</span>p_Q, res<span class="sc">$</span>p_P2, res<span class="sc">$</span>p_Q_asymptotic) <span class="co"># components, asymptotic P-value of Q</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; [1] 1.000000e-03 1.000000e-03 5.711569e-14</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>res<span class="sc">$</span>cramer_v                             <span class="co"># strength of dependence, 0 to 1</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; [1] 0.1092423</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="fu">c</span>(res<span class="sc">$</span>gamma_hat, res<span class="sc">$</span>tau_hat)            <span class="co"># efficiency and its standard deviation</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [1] 0.2864133 2.9425267</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">head</span>(res<span class="sc">$</span>cells, <span class="dv">4</span>)                       <span class="co"># most over- and under-represented patterns</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt;   pattern observed expected  residual</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 1   3-3-3       41    7.496 12.237195</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 2   1-5-5       20    7.496  4.567033</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 3   1-1-5       19    7.496  4.201787</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; 4   5-5-5       17    7.496  3.471296</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="fu">as.data.frame</span>(res)[, <span class="fu">c</span>(<span class="st">&quot;label&quot;</span>, <span class="st">&quot;n&quot;</span>, <span class="st">&quot;p_C&quot;</span>, <span class="st">&quot;cramer_v&quot;</span>)]   <span class="co"># one row of results</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt;   label   n   p_C  cramer_v</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; 1 China 939 0.001 0.1092423</span></span></code></pre></div>
+<p>Options and prices:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">serial_test</span>(exchange_rates<span class="sc">$</span>Japan, <span class="at">transform =</span> <span class="st">&quot;logdiff&quot;</span>, <span class="at">label =</span> <span class="st">&quot;Japan&quot;</span>)  <span class="co"># prices -&gt; log returns</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">serial_test</span>(x, <span class="at">m =</span> <span class="dv">3</span>, <span class="at">d =</span> <span class="dv">4</span>, <span class="at">lags =</span> <span class="dv">3</span>, <span class="at">B =</span> <span class="dv">99999</span>, <span class="at">alpha =</span> <span class="fl">0.01</span>)           <span class="co"># options</span></span></code></pre></div>
+<p>Reading a file and screening several series, with P-values adjusted
+for multiple testing (Benjamini–Hochberg):</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>fx <span class="ot">&lt;-</span> <span class="fu">read_series</span>(<span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;exchange_rates.csv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ivserial&quot;</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>sc <span class="ot">&lt;-</span> <span class="fu">screen_series</span>(fx[, <span class="fu">c</span>(<span class="st">&quot;China&quot;</span>, <span class="st">&quot;India&quot;</span>, <span class="st">&quot;Japan&quot;</span>, <span class="st">&quot;Euro&quot;</span>)], <span class="at">transform =</span> <span class="st">&quot;logdiff&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                    <span class="at">B =</span> <span class="dv">999</span>, <span class="at">seed =</span> <span class="dv">1</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>sc</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; Screening summary (Benjamini-Hochberg adjustment over the series tested)</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; series                        n       p_C    adj. p   V-hat  Gamma-hat  decision</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; China                       939    0.0010    0.0020   0.109     0.2864  reject</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; India                       939    0.0010    0.0020   0.072     0.1247  reject</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; Japan                       939    0.0060    0.0080   0.047     0.0535  reject</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; Euro                        939    0.4570    0.4570   0.017     0.0071  -</span></span></code></pre></div>
+<p><code>sc$results</code> holds the individual results and
+<code>summary(sc)</code> prints every report.</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>serial_test(x, m, d, d2, lags, B, seed, alpha, transform, label, n_cells)</code></td>
+<td>the test</td>
+</tr>
+<tr class="even">
+<td><code>screen_series(data, columns, ...)</code></td>
+<td>many series, Benjamini–Hochberg adjustment</td>
+</tr>
+<tr class="odd">
+<td><code>required_sample_size(gamma, m, d, alpha, power, tau)</code></td>
+<td>observations needed for a given power</td>
+</tr>
+<tr class="even">
+<td><code>approximate_power(gamma, n, m, d, alpha, tau)</code></td>
+<td>power for n observations</td>
+</tr>
+<tr class="odd">
+<td><code>sample_size_table(gamma, m, d, alpha, tau, power)</code></td>
+<td>sample sizes for several powers</td>
+</tr>
+<tr class="even">
+<td><code>serial_cramer_v(gamma, m, d)</code>,
+<code>gamma_from_cramer_v(v, m, d)</code></td>
+<td>convert between Gamma and V</td>
+</tr>
+<tr class="odd">
+<td><code>choose_resolution(n)</code></td>
+<td>default (m, d)</td>
+</tr>
+<tr class="even">
+<td><code>null_limit_summary(m, d)</code>,
+<code>null_limit_sf(q, m, d)</code>,
+<code>null_limit_quantile(alpha, m, d)</code></td>
+<td>null limit: moments, critical values, P-values</td>
+</tr>
+<tr class="odd">
+<td><code>read_series(path)</code></td>
+<td>numeric columns of a CSV, TXT or Excel file</td>
+</tr>
+<tr class="even">
+<td><code>ivserial_app()</code></td>
+<td>the window</td>
+</tr>
+<tr class="odd">
+<td><code>ivserial_guide()</code></td>
+<td>this guide in the browser</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="reading-the-output" class="section level2">
+<h2>7. Reading the output</h2>
+<ul>
+<li><strong>C</strong> is the test to use. A P-value below the level
+(e.g. 0.05) rejects serial independence: the series has dependence that
+an i.i.d. sequence would not show.</li>
+<li><strong>Q</strong> looks at blocks of <em>m</em> consecutive values
+and <strong>P2</strong> at pairs at lags 1 and 2; C combines them
+exactly.</li>
+<li><strong>permutation / asymptotic.</strong> Permutation P-values are
+exact; asymptotic ones use the explicit limits and are accurate for n ≥
+350.</li>
+<li><strong>V-hat</strong> is the strength of dependence between 0 and 1
+(serial Cramér coefficient): 0 means that blocks of <em>m</em>
+consecutive classes are independent, 1 that the class of any one value
+determines its whole block. For <em>m</em> = 2 it is Cramér’s V of
+consecutive classes. Compare values at the same (<em>m</em>,
+<em>d</em>).</li>
+<li><strong>Gamma-hat</strong> is the efficiency: the normalized
+information variance, the approximate Bahadur slope of the test; Gamma =
+(d^(m−1) − 1)·V². It drives the sample-size calculation and is about 0
+under independence.</li>
+<li><strong>Patterns.</strong> Each value is assigned to one of
+<em>d</em> classes by its rank (1 = lowest, <em>d</em> = highest).
+Residual = (observed − expected)/√expected; |residual| &gt; 3 is
+notable. For the yuan, the pattern 3-3-3 occurs 41 times against 7.5
+expected (residual 12.2): runs of near-zero changes around the official
+reference rate. The patterns 1-5-5, 1-1-5 and 5-5-5, made of large moves
+of either sign, reflect volatility clustering.</li>
+</ul>
+<p>A rejection means that the values are not i.i.d. The patterns
+indicate the kind of dependence, not a particular model.</p>
+</div>
+<div id="sample-size-and-power" class="section level2">
+<h2>8. Sample size and power</h2>
+<p>Gamma is the efficiency of the test (its approximate Bahadur slope),
+so it converts directly into a sample size (Corollary 4.8 of the
+paper):</p>
+<p>power ≈ Φ( (K·Gamma + μ₀ − q_α) / √(K·tau² + V₀) ), K = n − m +
+1,</p>
+<p>where μ₀, V₀ and q_α are the mean, variance and upper α point of the
+null limit. <code>serial_test</code> estimates both Gamma and tau from
+the data, so a pilot sample or a comparable series gives a realistic
+plan. With tau = 0 the formula is accurate for weak dependence and
+otherwise optimistic.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">approximate_power</span>(<span class="fl">0.13</span>, <span class="at">n =</span> <span class="dv">350</span>, <span class="at">m =</span> <span class="dv">3</span>, <span class="at">d =</span> <span class="dv">4</span>, <span class="at">tau =</span> <span class="fl">1.13</span>)  <span class="co"># ARCH(1); simulated: 0.82</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.8386066</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">sample_size_table</span>(<span class="fl">0.13</span>, <span class="at">m =</span> <span class="dv">3</span>, <span class="at">d =</span> <span class="dv">4</span>, <span class="at">tau =</span> <span class="fl">1.13</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt;   power   n</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; 1  0.50 166</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; 2  0.80 317</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; 3  0.90 423</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; 4  0.95 527</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="fu">required_sample_size</span>(<span class="fu">gamma_from_cramer_v</span>(<span class="fl">0.1</span>, <span class="dv">3</span>, <span class="dv">4</span>), <span class="at">m =</span> <span class="dv">3</span>, <span class="at">d =</span> <span class="dv">4</span>, <span class="at">tau =</span> <span class="dv">1</span>)  <span class="co"># from V</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; [1] 256</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="fu">choose_resolution</span>(<span class="dv">350</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; m d </span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; 3 4</span></span></code></pre></div>
+<p>From a pilot sample:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">serial_test</span>(pilot, <span class="at">seed =</span> <span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">required_sample_size</span>(r<span class="sc">$</span>gamma_hat, r<span class="sc">$</span>m, r<span class="sc">$</span>d, <span class="at">power =</span> <span class="fl">0.8</span>, <span class="at">tau =</span> r<span class="sc">$</span>tau_hat)</span></code></pre></div>
+</div>
+<div id="the-null-distribution" class="section level2">
+<h2>9. The null distribution</h2>
+<p>Under independence Q converges to L(m, d) = Σ_{s=2}^{m} (m − s + 1)
+χ²((d−1)² d^(s−2)) (Theorem 4.1 of the paper):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">null_limit_summary</span>(<span class="dv">3</span>, <span class="dv">4</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; Null limit of Q for m = 3, d = 4 (64 patterns)</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; L = 2 x chi2(9) + 1 x chi2(36)</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; mean = 54.00, variance = 144.00</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; critical value at level 0.10: 69.832</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; critical value at level 0.05: 75.257</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; critical value at level 0.01: 86.294</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">null_limit_sf</span>(<span class="dv">80</span>, <span class="at">m =</span> <span class="dv">3</span>, <span class="at">d =</span> <span class="dv">4</span>)        <span class="co"># asymptotic P-value of Q = 80</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; [1] 0.02579681</span></span></code></pre></div>
+</div>
+<div id="residuals-of-fitted-models" class="section level2">
+<h2>10. Residuals of fitted models</h2>
+<p>The test can be applied to residuals, for example of an ARMA or
+standardized GARCH model, to check whether dependence remains. The
+P-values are then only approximately exact. When the model is estimated
+efficiently (maximum likelihood with the correct innovation
+distribution) they remain valid and are slightly conservative (Theorem
+4.11 of the paper). After Gaussian quasi-maximum likelihood with
+non-normal innovations they can be misleading, especially for squared
+residuals; then use a model-based bootstrap: simulate from the fitted
+model, re-estimate, and recompute the statistic (Section 4.5 of the
+paper).</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">arima.sim</span>(<span class="fu">list</span>(<span class="at">ar =</span> <span class="fl">0.5</span>), <span class="at">n =</span> <span class="dv">500</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">arima</span>(y, <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="fu">serial_test</span>(<span class="fu">residuals</span>(fit), <span class="at">B =</span> <span class="dv">999</span>, <span class="at">seed =</span> <span class="dv">1</span>)<span class="sc">$</span>p_C</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; [1] 0.905</span></span></code></pre></div>
+</div>
+<div id="troubleshooting" class="section level2">
+<h2>11. Troubleshooting</h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>there is no package called &#39;shiny&#39;</code></td>
+<td><code>install.packages(&quot;shiny&quot;)</code></td>
+</tr>
+<tr class="even">
+<td>Excel file cannot be read</td>
+<td><code>install.packages(&quot;readxl&quot;)</code></td>
+</tr>
+<tr class="odd">
+<td><code>install_github</code> fails</td>
+<td><code>install.packages(&quot;remotes&quot;)</code> first; or install from the
+downloaded <code>.tar.gz</code> file</td>
+</tr>
+<tr class="even">
+<td>“only … blocks per pattern”</td>
+<td>The series is short for the chosen (m, d); use the automatic choice
+or smaller values.</td>
+</tr>
+<tr class="odd">
+<td>“at least 20 observations are needed”</td>
+<td>The series (after removing missing values and differencing) is too
+short.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="reference-and-citation" class="section level2">
+<h2>12. Reference and citation</h2>
+<p>Default resolution: (m, d) = (3, 3) for n &lt; 300, (3,
+⌊(n−300)/400⌋+4) for 300 ≤ n &lt; 1500, and m = ⌊log n/(2 log 3)⌋, d = 3
+beyond; portmanteau classes 3, 4 or 5. Ties are broken at random, which
+keeps the test exact. P-value = (1 + #{permuted statistics ≥
+observed})/(B + 1). Computing time: about 1.5 seconds for n = 1000 with
+B = 9999.</p>
+<p>If you use the package, please cite the paper;
+<code>citation(&quot;ivserial&quot;)</code> gives the reference. Source code and
+bug reports: <a href="https://github.com/emaad7/ivserial-r" class="uri">https://github.com/emaad7/ivserial-r</a>. License: MIT.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

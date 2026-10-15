@@ -1,0 +1,291 @@
+---
+title: "ivserial: user guide"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{ivserial: user guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+Exact symbolic tests of serial independence. Companion software to
+E. Ashtari Nezhad, *Information Variance and Exact Symbolic Tests of Serial
+Independence*. A Python version with the same functions and output is on PyPI
+(`pip install ivserial`).
+
+## 1. What the package does
+
+`ivserial` tests whether a time series is a sequence of independent and
+identically distributed (i.i.d.) values. The test is **rank based and exact**:
+under independence its P-value is valid for every sample size and every
+continuous distribution, with no model, bandwidth or tuning parameter to
+choose. It reports
+
+* the P-value of the proposed **combined test C** and of its two components:
+  the **block statistic Q**, which sees dependence among several consecutive
+  values, including dependence that is invisible in every pair, and the
+  **portmanteau P2**, which looks at pairs at lags 1 and 2;
+* **V-hat**, the strength of the dependence on a scale from 0 to 1 (the serial
+  Cramér coefficient, which for pairs is Cramér's V), and **Gamma-hat**, the
+  efficiency of the test;
+* the **patterns** of consecutive values that occur unusually often or rarely,
+  which show what kind of dependence is present;
+* **sample size and power** calculations, and the explicit **null
+  distribution** of Q.
+
+## 2. Two ways to use it
+
+* **The window (no programming).** `ivserial_app()` opens the graphical
+  interface in the browser: open a CSV or Excel file, pick a column, press
+  *Run test*. Sample-size planning, the null distribution and this guide are
+  in their own tabs.
+* **R code.** `serial_test(x)` in a script or at the console; suited to many
+  series and to reproducible work.
+
+Both use the same functions and give the same results: everything that can be
+done in code can also be done in the window.
+
+| Task | Window (`ivserial_app()`) | R |
+|---|---|---|
+| Test one series | Test tab, choose column, *Run test* | `serial_test(x)` |
+| Screen many series | tick *test all columns* | `screen_series(data)` |
+| Prices to log returns | *Transform: log returns* | `transform = "logdiff"` |
+| Options (B, seed, m, d, level, lags, patterns) | option fields | arguments of `serial_test` |
+| Save results | *Save report (.txt)*, *Save results (.csv)* | `capture.output(print(res))`, `as.data.frame(res)` |
+| Sample size / power | Sample size & power tab | `required_sample_size`, `approximate_power`, `sample_size_table` |
+| Default resolution for n | *Resolution for n* | `choose_resolution(n)` |
+| Null distribution, critical values | Null distribution tab | `null_limit_summary`, `null_limit_sf`, `null_limit_quantile` |
+
+## 3. Installation
+
+You need R (free, from <https://cran.r-project.org>); RStudio is optional.
+In R, install the package from GitHub:
+
+```r
+install.packages("remotes")                       # once
+remotes::install_github("emaad7/ivserial-r")
+```
+
+or, from a downloaded source file, `install.packages("ivserial_1.0.1.tar.gz", repos = NULL, type = "source")`.
+For the window also install `shiny`, and for Excel files `readxl`:
+
+```r
+install.packages(c("shiny", "readxl"))
+```
+
+Then
+
+```r
+library(ivserial)
+ivserial_app()          # the window
+ivserial_guide()        # this guide in the browser (also vignette("ivserial"))
+```
+
+## 4. Preparing your data
+
+* A **CSV**, **TXT** or **Excel** (.xlsx) file, or any numeric vector in R.
+* **One series per column, rows in time order** (oldest first). A first row
+  with names is optional; the delimiter and a decimal comma are detected;
+  non-numeric columns such as dates are ignored; missing values are removed.
+* At least 20 observations; several hundred give the most informative results.
+* **Prices or returns?** The test is applied to the values you give it. For
+  prices and other trending series use the **log returns** (or differences): a
+  trending series is never i.i.d., and the test would only detect the trend.
+
+The package contains the 20 daily exchange rates analysed in the paper, as
+the data frame `exchange_rates` and as the file
+`system.file("extdata", "exchange_rates.csv", package = "ivserial")`
+(prices; use the log-return transform).
+
+## 5. The window
+
+`ivserial_app()` opens the window in the web browser (or in the RStudio
+viewer). It has four tabs.
+
+**Test.** *Browse* for your data file, or press *Use example data*. Choose the
+series (column), or tick *test all columns* to screen every column at once
+(with Benjamini–Hochberg adjustment). Choose the transform: none, differences,
+or log returns (prices). Press *Run test*. *Save report (.txt)* saves the
+report and *Save results (.csv)* one row of results per series. The options
+can be left at their defaults: *B* = 9999 random permutations, block length
+*m* and classes *d* chosen automatically (`auto`), level 0.05, portmanteau
+with lags 1 and 2. Keep the **seed** fixed to make the P-values reproducible;
+leave it blank for a random seed.
+
+**Sample size & power.** Enter Gamma, or V (between 0 and 1) instead, tau,
+*m*, *d*, the level and the target powers, then press *Required sample size*,
+*Power for n* or *Resolution for n*. *Use last test* fills in the estimates of
+the last test, for example on a pilot sample.
+
+**Null distribution.** Enter *m*, *d* and, optionally, a value of Q, and press
+*Compute*: the components, mean, variance and critical values of the limit,
+and the asymptotic P-value of Q.
+
+**User guide.** This guide.
+
+To finish, close the browser tab and press *Esc* (or *Stop*) in R.
+
+## 6. R code
+
+```{r}
+library(ivserial)
+x <- 100 * diff(log(exchange_rates$China))   # log returns of the yuan
+res <- serial_test(x, B = 999, seed = 1, label = "China")
+res
+```
+
+(The examples in this guide use `B = 999` to run quickly; the default is
+`B = 9999`.) The result is a list:
+
+```{r}
+res$p_C                                  # P-value of the combined test C
+res$reject                               # decision at level alpha
+c(res$p_Q, res$p_P2, res$p_Q_asymptotic) # components, asymptotic P-value of Q
+res$cramer_v                             # strength of dependence, 0 to 1
+c(res$gamma_hat, res$tau_hat)            # efficiency and its standard deviation
+head(res$cells, 4)                       # most over- and under-represented patterns
+as.data.frame(res)[, c("label", "n", "p_C", "cramer_v")]   # one row of results
+```
+
+Options and prices:
+
+```{r, eval = FALSE}
+serial_test(exchange_rates$Japan, transform = "logdiff", label = "Japan")  # prices -> log returns
+serial_test(x, m = 3, d = 4, lags = 3, B = 99999, alpha = 0.01)           # options
+```
+
+Reading a file and screening several series, with P-values adjusted for
+multiple testing (Benjamini–Hochberg):
+
+```{r}
+fx <- read_series(system.file("extdata", "exchange_rates.csv", package = "ivserial"))
+sc <- screen_series(fx[, c("China", "India", "Japan", "Euro")], transform = "logdiff",
+                    B = 999, seed = 1)
+sc
+```
+
+`sc$results` holds the individual results and `summary(sc)` prints every
+report.
+
+| Function | Purpose |
+|---|---|
+| `serial_test(x, m, d, d2, lags, B, seed, alpha, transform, label, n_cells)` | the test |
+| `screen_series(data, columns, ...)` | many series, Benjamini–Hochberg adjustment |
+| `required_sample_size(gamma, m, d, alpha, power, tau)` | observations needed for a given power |
+| `approximate_power(gamma, n, m, d, alpha, tau)` | power for n observations |
+| `sample_size_table(gamma, m, d, alpha, tau, power)` | sample sizes for several powers |
+| `serial_cramer_v(gamma, m, d)`, `gamma_from_cramer_v(v, m, d)` | convert between Gamma and V |
+| `choose_resolution(n)` | default (m, d) |
+| `null_limit_summary(m, d)`, `null_limit_sf(q, m, d)`, `null_limit_quantile(alpha, m, d)` | null limit: moments, critical values, P-values |
+| `read_series(path)` | numeric columns of a CSV, TXT or Excel file |
+| `ivserial_app()` | the window |
+| `ivserial_guide()` | this guide in the browser |
+
+## 7. Reading the output
+
+* **C** is the test to use. A P-value below the level (e.g. 0.05) rejects
+  serial independence: the series has dependence that an i.i.d. sequence
+  would not show.
+* **Q** looks at blocks of *m* consecutive values and **P2** at pairs at lags 1
+  and 2; C combines them exactly.
+* **permutation / asymptotic.** Permutation P-values are exact; asymptotic ones
+  use the explicit limits and are accurate for n ≥ 350.
+* **V-hat** is the strength of dependence between 0 and 1 (serial Cramér
+  coefficient): 0 means that blocks of *m* consecutive classes are
+  independent, 1 that the class of any one value determines its whole block.
+  For *m* = 2 it is Cramér's V of consecutive classes. Compare values at the
+  same (*m*, *d*).
+* **Gamma-hat** is the efficiency: the normalized information variance, the
+  approximate Bahadur slope of the test; Gamma = (d^(m−1) − 1)·V². It drives
+  the sample-size calculation and is about 0 under independence.
+* **Patterns.** Each value is assigned to one of *d* classes by its rank
+  (1 = lowest, *d* = highest). Residual = (observed − expected)/√expected;
+  |residual| > 3 is notable. For the yuan, the pattern 3-3-3 occurs 41 times
+  against 7.5 expected (residual 12.2): runs of near-zero changes around the
+  official reference rate. The patterns 1-5-5, 1-1-5 and 5-5-5, made of large
+  moves of either sign, reflect volatility clustering.
+
+A rejection means that the values are not i.i.d. The patterns indicate the
+kind of dependence, not a particular model.
+
+## 8. Sample size and power
+
+Gamma is the efficiency of the test (its approximate Bahadur slope), so it
+converts directly into a sample size (Corollary 4.8 of the paper):
+
+power ≈ Φ( (K·Gamma + μ₀ − q_α) / √(K·tau² + V₀) ),  K = n − m + 1,
+
+where μ₀, V₀ and q_α are the mean, variance and upper α point of the null
+limit. `serial_test` estimates both Gamma and tau from the data, so a pilot
+sample or a comparable series gives a realistic plan. With tau = 0 the
+formula is accurate for weak dependence and otherwise optimistic.
+
+```{r}
+approximate_power(0.13, n = 350, m = 3, d = 4, tau = 1.13)  # ARCH(1); simulated: 0.82
+sample_size_table(0.13, m = 3, d = 4, tau = 1.13)
+required_sample_size(gamma_from_cramer_v(0.1, 3, 4), m = 3, d = 4, tau = 1)  # from V
+choose_resolution(350)
+```
+
+From a pilot sample:
+
+```{r, eval = FALSE}
+r <- serial_test(pilot, seed = 1)
+required_sample_size(r$gamma_hat, r$m, r$d, power = 0.8, tau = r$tau_hat)
+```
+
+## 9. The null distribution
+
+Under independence Q converges to
+L(m, d) = Σ_{s=2}^{m} (m − s + 1) χ²((d−1)² d^(s−2)) (Theorem 4.1 of the paper):
+
+```{r}
+null_limit_summary(3, 4)
+null_limit_sf(80, m = 3, d = 4)        # asymptotic P-value of Q = 80
+```
+
+## 10. Residuals of fitted models
+
+The test can be applied to residuals, for example of an ARMA or standardized
+GARCH model, to check whether dependence remains. The P-values are then only
+approximately exact. When the model is estimated efficiently (maximum
+likelihood with the correct innovation distribution) they remain valid and
+are slightly conservative (Theorem 4.11 of the paper). After Gaussian
+quasi-maximum likelihood with non-normal innovations they can be misleading,
+especially for squared residuals; then use a model-based bootstrap: simulate
+from the fitted model, re-estimate, and recompute the statistic (Section 4.5
+of the paper).
+
+```{r}
+set.seed(3)
+y <- arima.sim(list(ar = 0.5), n = 500)
+fit <- arima(y, order = c(1, 0, 0))
+serial_test(residuals(fit), B = 999, seed = 1)$p_C
+```
+
+## 11. Troubleshooting
+
+| Message | Solution |
+|---|---|
+| `there is no package called 'shiny'` | `install.packages("shiny")` |
+| Excel file cannot be read | `install.packages("readxl")` |
+| `install_github` fails | `install.packages("remotes")` first; or install from the downloaded `.tar.gz` file |
+| "only ... blocks per pattern" | The series is short for the chosen (m, d); use the automatic choice or smaller values. |
+| "at least 20 observations are needed" | The series (after removing missing values and differencing) is too short. |
+
+## 12. Reference and citation
+
+Default resolution: (m, d) = (3, 3) for n < 300, (3, ⌊(n−300)/400⌋+4) for
+300 ≤ n < 1500, and m = ⌊log n/(2 log 3)⌋, d = 3 beyond; portmanteau classes
+3, 4 or 5. Ties are broken at random, which keeps the test exact.
+P-value = (1 + #{permuted statistics ≥ observed})/(B + 1). Computing time:
+about 1.5 seconds for n = 1000 with B = 9999.
+
+If you use the package, please cite the paper; `citation("ivserial")` gives
+the reference. Source code and bug reports:
+<https://github.com/emaad7/ivserial-r>. License: MIT.
