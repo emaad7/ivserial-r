@@ -1,0 +1,20 @@
+bibentry(
+  bibtype = "Unpublished",
+  title = "Information Variance and Exact Symbolic Tests of Serial Independence",
+  author = person("Emad", "Ashtari Nezhad"),
+  year = "2026",
+  note = "Manuscript",
+  textVersion = paste("Ashtari Nezhad, E. (2026).",
+                      "Information Variance and Exact Symbolic Tests of Serial Independence. Manuscript.")
+)
+bibentry(
+  bibtype = "Manual",
+  title = "ivserial: Exact Symbolic Tests of Serial Independence",
+  author = person("Emad", "Ashtari Nezhad"),
+  year = "2026",
+  note = paste("R package version", meta$Version),
+  url = "https://github.com/emaad7/ivserial-r",
+  doi = "10.5281/zenodo.23405762",
+  textVersion = paste0("Ashtari Nezhad, E. (2026). ivserial: Exact Symbolic Tests of Serial Independence. ",
+                       "R package version ", meta$Version, ". https://doi.org/10.5281/zenodo.23405762")
+)
